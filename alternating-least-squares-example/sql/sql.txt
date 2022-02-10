@@ -1,0 +1,58 @@
+CREATE DATABASE IF NOT EXISTS recommender_db;
+
+USE recommender_db;
+
+CREATE TABLE movies (
+     id INT PRIMARY KEY,
+     title VARCHAR(255),
+     genres VARCHAR(255),
+     poster VARCHAR(255),
+     factors BINARY(80)
+);
+
+CREATE TABLE users (
+     id INT PRIMARY KEY,
+     gender VARCHAR(5),
+     age INT,
+     occupation VARCHAR(255),
+     zip_code VARCHAR(255),
+     factors BINARY(80)
+);
+
+SELECT movies.title,
+       movies.genres,
+       DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors)) AS score
+FROM users JOIN movies
+WHERE users.id = 1
+ORDER BY score DESC
+LIMIT 10;
+
+SELECT users.gender,
+       users.age,
+       users.occupation,
+       users.zip_code,
+       DOT_PRODUCT(UNHEX(movies.factors), UNHEX(users.factors)) AS score
+FROM movies JOIN users
+WHERE movies.id = 1
+ORDER BY score DESC
+LIMIT 10;
+
+SELECT movies.title,
+       movies.genres,
+       DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors)) AS score
+FROM users JOIN movies
+WHERE users.id = 1 AND
+       SUBSTRING(movies.title, -3, 1) = 8 AND
+       movies.genres LIKE '%sci-fi%'
+ORDER BY score DESC
+LIMIT 10;
+
+SELECT movies.title,
+       movies.genres,
+       AVG(DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors))) AS avg_score,
+       count(1) AS c
+FROM users JOIN movies
+WHERE users.gender = 'M' AND users.age = 18 AND DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors)) > 5
+GROUP BY 1, 2
+ORDER BY avg_score DESC
+LIMIT 10;
