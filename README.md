@@ -9,3 +9,7 @@
 - [alternating-least-squares-example](https://github.com/VeryFatBoy/singlestore-ml-examples/tree/main/alternating-least-squares-example)
 
   - [Using SingleStore, Spark and Alternating Least Squares (ALS) to build a Movie Recommender System](https://medium.com/@VeryFatBoy/using-singlestore-spark-and-alternating-least-squares-als-to-build-a-movie-recommender-system-6e74f4e5908d)
+
+- [singlestore-image-classification-example](https://github.com/VeryFatBoy/singlestore-ml-examples/tree/main/singlestore-image-classification-example)
+
+  - [Image Classification using SingleStoreDB, Keras and Tensorflow](https://medium.com/@VeryFatBoy/image-classification-using-singlestoredb-keras-and-tensorflow-b6c3877d7571)
