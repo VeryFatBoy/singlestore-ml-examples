@@ -1,0 +1,104 @@
+CREATE DATABASE IF NOT EXISTS ml;
+
+USE ml;
+
+CREATE TABLE tf_images (
+     img_idx INT(10) UNSIGNED NOT NULL,
+     img_label TINYINT(4),
+     img_vector BLOB,
+     img_use TINYINT(4),
+     KEY(img_idx)
+);
+
+CREATE TABLE img_use (
+     use_id TINYINT(4) NOT NULL,
+     use_name VARCHAR(10) NOT NULL,
+     use_desc VARCHAR(100) NOT NULL,
+     PRIMARY KEY(use_id)
+);
+
+CREATE TABLE categories (
+     class_idx TINYINT(4) NOT NULL,
+     class_name VARCHAR(20) DEFAULT NULL,
+     PRIMARY KEY(class_idx)
+);
+
+CREATE TABLE prediction_results (
+     img_idx INT UNSIGNED NOT NULL,
+     img_label TINYINT(4),
+     img_use TINYINT(4),
+     t_shirt_top FLOAT,
+     trouser FLOAT,
+     pullover FLOAT,
+     dress FLOAT,
+     coat FLOAT,
+     sandal FLOAT,
+     shirt FLOAT,
+     sneaker FLOAT,
+     bag FLOAT,
+     ankle_boot FLOAT,
+     KEY(img_idx)
+);
+
+INSERT INTO img_use VALUES
+(1, "Training", "The image is used for training the model"),
+(2, "Testing", "The image is used for testing the model");
+
+INSERT INTO categories VALUES
+(0, "t_shirt_top"),
+(1, "trouser"),
+(2, "pullover"),
+(3, "dress"),
+(4, "coat"),
+(5, "sandal"),
+(6, "shirt"),
+(7, "sneaker"),
+(8, "bag"),
+(9, "ankle_boot");
+
+SELECT COUNT(*) AS count
+FROM tf_images;
+
+SELECT *
+FROM tf_images
+LIMIT 5;
+
+SELECT use_name AS Image_Role, use_desc AS Description
+FROM img_use;
+
+SELECT class_name AS Class_Name
+FROM categories;
+
+SELECT cn.class_name AS Class_Name,
+     iu.use_name AS Image_Use,
+     img_vector AS Vector_Representation
+FROM tf_images AS ti
+     INNER JOIN categories AS cn ON ti.img_label = cn.class_idx
+     INNER JOIN img_use AS iu ON ti.img_use = iu.use_id
+LIMIT 5;
+
+SELECT class_name AS Image_Label,
+     COUNT(CASE WHEN img_use = 1 THEN img_label END) AS Training_Images,
+     COUNT(CASE WHEN img_use = 2 THEN img_label END) AS Testing_Images
+FROM tf_images
+     INNER JOIN categories ON class_idx = img_label
+GROUP BY class_name;
+
+SELECT img_idx, img_label, use_name, use_desc
+FROM tf_images
+     INNER JOIN img_use ON use_id = img_use
+WHERE use_name = 'Testing' AND img_idx = 0;
+
+-- Additional Query 1
+SELECT *
+FROM tf_images
+     INNER JOIN img_use ON use_id = img_use
+WHERE use_name = 'Testing'
+ORDER BY img_idx ASC
+LIMIT 5;
+
+-- Additional Query 2
+SELECT t_shirt_top, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle_boot, class_name AS Test_Label
+FROM prediction_results
+     INNER JOIN categories ON img_label = class_idx
+WHERE img_idx = 0;
