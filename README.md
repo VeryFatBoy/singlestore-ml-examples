@@ -13,3 +13,7 @@
 - [image-classification-example](https://github.com/VeryFatBoy/singlestore-ml-examples/tree/main/image-classification-example)
 
   - [Image Classification using SingleStoreDB, Keras and Tensorflow](https://medium.com/@VeryFatBoy/image-classification-using-singlestoredb-keras-and-tensorflow-b6c3877d7571)
+
+- [mindsdb-examples](https://github.com/VeryFatBoy/singlestore-ml-examples/edit/main/mindsdb-examples)
+
+  - [Quickstart to using SingleStore DB, MindsDB and Deepnote for Data Science](https://medium.com/@VeryFatBoy/quickstart-to-using-singlestore-db-mindsdb-and-deepnote-for-data-science-1f607f24843d)
