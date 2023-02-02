@@ -50,7 +50,7 @@ LIMIT 10;
 SELECT movies.title,
        movies.genres,
        AVG(DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors))) AS avg_score,
-       count(1) AS c
+       COUNT(1) AS c
 FROM users JOIN movies
 WHERE users.gender = 'M' AND users.age = 18 AND DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors)) > 5
 GROUP BY 1, 2
