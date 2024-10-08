@@ -1,6 +1,7 @@
 streamlit
 matplotlib
+mysqlclient
 plotly
 numpy
 pandas
-pymysql
+sqlalchemy
