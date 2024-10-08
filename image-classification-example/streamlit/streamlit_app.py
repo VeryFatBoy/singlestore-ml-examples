@@ -7,14 +7,11 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import numpy as np
 import pandas as pd
-import pymysql
+import sqlalchemy
 
-# Initialize connection.
+# Initialise connection.
 
-def init_connection():
-    return pymysql.connect(**st.secrets["singlestore"])
-
-conn = init_connection()
+conn = st.connection("singlestore", type = "sql")
 
 def hex_to_vector(vector):
     vector_unhex = binascii.unhexlify(vector)
@@ -23,12 +20,14 @@ def hex_to_vector(vector):
 
 img_idx = st.slider("Image Index", 0, 9999, 0)
 
-img_df = pd.read_sql("""
-SELECT img_vector
-FROM tf_images
-     INNER JOIN img_use ON use_id = img_use
-WHERE use_name = 'Testing' AND img_idx = %s;
-""", conn, params = ([str(img_idx)]))
+stmt = f"""
+    SELECT img_vector
+    FROM tf_images
+    INNER JOIN img_use ON use_id = img_use
+    WHERE use_name = 'Testing' AND img_idx = {img_idx};
+"""
+
+img_df = conn.query(stmt)
 
 vector_string = img_df["img_vector"][0]
 
@@ -39,24 +38,26 @@ plt.imshow(img, cmap = plt.cm.binary)
 plt.axis("off")
 st.pyplot(fig)
 
-predictions_df = pd.read_sql("""
-SELECT t_shirt_top, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle_boot, class_name
-FROM prediction_results
-     INNER JOIN categories ON img_label = class_idx
-WHERE img_idx = %s;
-""", conn, params = ([str(img_idx)]))
+stmt = f"""
+    SELECT t_shirt_top, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle_boot, class_name
+    FROM prediction_results
+    INNER JOIN categories ON img_label = class_idx
+    WHERE img_idx = {img_idx};
+"""
+
+predictions_df = conn.query(stmt)
 
 classes = [
-  "t_shirt_top",
-  "trouser",
-  "pullover",
-  "dress",
-  "coat",
-  "sandal",
-  "shirt",
-  "sneaker",
-  "bag",
-  "ankle_boot"
+    "t_shirt_top",
+    "trouser",
+    "pullover",
+    "dress",
+    "coat",
+    "sandal",
+    "shirt",
+    "sneaker",
+    "bag",
+    "ankle_boot"
 ]
 
 num_classes = len(classes)
@@ -71,18 +72,21 @@ st.write("Predicted: ", predicted)
 st.write("Actual: ", actual)
 
 if (predicted == actual):
-   st.write("Prediction Correct")
+    st.write("Prediction Correct")
 else:
-   st.write("Prediction Incorrect")
+    st.write("Prediction Incorrect")
 
 probabilities = [predictions_df[class_name][0] for class_name in classes]
 
-bar = px.bar(probabilities,
-             x = classes,
-             y = probabilities,
-             color = probabilities,
-             labels = dict(x = "Classes", y = "Probability"),
-             title = "Prediction")
+bar = px.bar(
+    probabilities,
+    x = classes,
+    y = probabilities,
+    color = probabilities,
+    color_continuous_scale = "inferno",
+    labels = dict(x = "Classes", y = "Probability"),
+    title = "Prediction"
+)
 
 bar.update_xaxes(tickangle = 45)
 bar.layout.coloraxis.colorbar.title = "Probability"
@@ -90,3 +94,4 @@ bar.layout.coloraxis.colorbar.title = "Probability"
 st.plotly_chart(bar)
 
 st.table(predictions_df)
+
