@@ -2,21 +2,23 @@ CREATE DATABASE IF NOT EXISTS recommender_db;
 
 USE recommender_db;
 
-CREATE TABLE movies (
-     id INT PRIMARY KEY,
-     title VARCHAR(255),
-     genres VARCHAR(255),
-     poster VARCHAR(255),
-     factors BINARY(80)
+DROP TABLE IF EXISTS movies;
+CREATE TABLE IF NOT EXISTS movies (
+    id INT PRIMARY KEY,
+    title VARCHAR(255),
+    genres VARCHAR(255),
+    poster VARCHAR(255),
+    factors BINARY(80)
 );
 
-CREATE TABLE users (
-     id INT PRIMARY KEY,
-     gender VARCHAR(5),
-     age INT,
-     occupation VARCHAR(255),
-     zip_code VARCHAR(255),
-     factors BINARY(80)
+DROP TABLE IF EXISTS users;
+CREATE TABLE IF NOT EXISTS users (
+    id INT PRIMARY KEY,
+    gender VARCHAR(5),
+    age INT,
+    occupation VARCHAR(255),
+    zip_code VARCHAR(255),
+    factors BINARY(80)
 );
 
 SELECT movies.title,
@@ -43,7 +45,7 @@ SELECT movies.title,
 FROM users JOIN movies
 WHERE users.id = 1 AND
        SUBSTRING(movies.title, -3, 1) = 8 AND
-       movies.genres LIKE '%sci-fi%'
+       movies.genres LIKE '%Sci-Fi%'
 ORDER BY score DESC
 LIMIT 10;
 
