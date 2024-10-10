@@ -2,32 +2,34 @@
 
 import streamlit as st
 import pandas as pd
-import pymysql
+import sqlalchemy
 
-# Initialize connection.
+# Initialise connection.
+conn = st.connection("singlestore", type = "sql")
 
-def init_connection():
-    return pymysql.connect(**st.secrets["singlestore"])
-
-conn = init_connection()
-
+# Sidebar for user input
 user_id = st.sidebar.number_input("Enter a User Id", min_value = 1, max_value = 6040)
 
-# Perform query.
+# SQL statement to get movie recommendations
+stmt = f"""
+    SELECT movies.title, movies.poster,
+        DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors)) AS score
+    FROM users JOIN movies ON users.id = {user_id}
+    ORDER BY score DESC
+    LIMIT 10;
+"""
 
-data = pd.read_sql("""
-SELECT movies.title,
-       movies.poster,
-       DOT_PRODUCT(UNHEX(users.factors), UNHEX(movies.factors)) AS score
-FROM users JOIN movies
-WHERE users.id = %s
-ORDER BY score DESC
-LIMIT 10;
-""", conn, params = ([str(user_id)]))
+# Execute the query and store results
+data = conn.query(stmt)
 
-st.subheader("Movie Recommendations")
+# Check if any data returned and display recommendations
+if not data.empty:
+    st.subheader("Movie Recommendations")
 
-for i in range(10):
-   cols = st.columns(1)
-   cols[0].header(data["title"][i])
-   cols[0].image(data["poster"][i], width = 200)
+    # Display recommended movies
+    for i in range(len(data)):
+        cols = st.columns(1)
+        cols[0].header(data["title"][i])
+        cols[0].image(data["poster"][i], width = 200)
+else:
+    st.write("No recommendations found.")
