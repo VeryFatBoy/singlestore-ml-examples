@@ -4,9 +4,9 @@ import streamlit as st
 import array
 import binascii
 import matplotlib.pyplot as plt
-import plotly.express as px
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import sqlalchemy
 
 # Initialise connection.
